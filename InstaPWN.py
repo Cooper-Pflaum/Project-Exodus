@@ -144,18 +144,18 @@ def getMedia(username):
     class_list = set()
 
     # iterate all tags
-    for tag in tags:
+    # for tag in tags:
     
-        # find all element of tag
-        for i in soup.find_all( tag ):
+    #     # find all element of tag
+    #     for i in soup.find_all( tag ):
     
-            # if tag has attribute of class
-            if i.has_attr('img'):
+    #         # if tag has attribute of class
+    #         if i.has_attr('img'):
     
-                if len( i['img'] ) != 0:
-                    class_list.add(" ".join( i['img']))
+    #             if len( i['img'] ) != 0:
+    #                 class_list.add(" ".join( i['img']))
     
-    print( class_list )
+    # print( class_list )
     
     
     
