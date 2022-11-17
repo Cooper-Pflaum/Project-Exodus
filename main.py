@@ -15,9 +15,9 @@ def print_menu():
     print('      -username    | Get targets followers, following, and posts')
     print('      -photo       | Get targets profile picture')
     print('      -posts       | Download all targets posts')
-    print('      -email       | Get targets email')
-    print('      -phone       | Get targets phone number')
-    print('      -dox         | Get targets address')
+    # print('      -email       | Get targets email')
+    # print('      -phone       | Get targets phone number')
+    # print('      -dox         | Get targets address')
     print(colors.reset)
 
 def startProgram():

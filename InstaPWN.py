@@ -1,18 +1,14 @@
 # importing libraries
-import asyncio
-import json
-import lxml
 import os
-import pandas as pd
 import shutil
-import re
+import time
 import requests
 import urllib
 from bs4 import BeautifulSoup
 from Colors import colors
 from googlesearch import search
-from pyppeteer import launch    
-
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 URL = 'https://www.instagram.com/{}/?hl=en'
 
 # instantiate a chrome options object so you can set the size and headless preference
@@ -40,7 +36,8 @@ def getTopResults(name, last_name = '', num_results=20, command = ''):
             # print(colors.green + 'New URL: ' + url + colors.reset)
         if '/' in user:
             user = user.replace('/','')
-        pwned_users.append(user)
+        if user != ''   :
+            pwned_users.append(user)
    
     if last_name != '':
         print(colors.grey + f'Top results for {name}' + f' { last_name}:')
@@ -134,46 +131,52 @@ def getPhoto(username, command):
         print(colors.green + 'Successfully downloaded to folder: pwned_users')
 
 def getMedia(username):
-    response = requests.get(URL.format(username))
+    def find_all(a_str, sub):
+        start = 0
+        while True:
+            start = a_str.find(sub, start)
+            if start == -1: return
+            yield start
+            start += len(sub) # use start += 1 to find overlapping matches
+
+
+    def replace_all_bad_chars_in_url(url):
+        return url.replace('&amp;', '&')
+    
+    opts = Options()
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+    opts.add_argument(user_agent)
+
+    opts.headless = False
+
+    driver = webdriver.Chrome('./chromedriver.exe', options=opts)
+ 
+    driver.get(f'https://www.instagram.com/{username}/?hl=en')
+    
     # converting the text
-    soup = BeautifulSoup(response.text, 'html.parser')
-    # photo = soup.find_all('img', alt=True)
-    # print(photo)
-    # photo_url = photo[0].get('content')
-    tags = {tag.name for tag in soup.find_all()}
-    class_list = set()
+    html = driver.page_source
 
-    # iterate all tags
-    # for tag in tags:
+    soup = BeautifulSoup(html, 'html.parser')
+    # all_html = soup.text()
+    # print(soup.prettify)
+    page_html = str(soup)
+    print(page_html)
     
-    #     # find all element of tag
-    #     for i in soup.find_all( tag ):
+    index = list(find_all(page_html, 'https://instagram')) # [0, 5, 10, 15]
+    print(index)
+    i=0
+    for post_url in index:
+        # shutil.move(img_file, parent_dir + f'\{username}')
+        filter1 = replace_all_bad_chars_in_url(page_html[post_url: post_url + 361])
+        filter2 = filter1.split('"')[0]
+        filter3 = filter2.split(' ')[0]
+        photo_url = filter3
+        print(photo_url)
+        
+        
+        img_file = username + str(i) + '.png'
+        urllib.request.urlretrieve(photo_url, img_file)
+            
+        i+=1
+    # print ("\n".join(set(tag['src'] for tag in tags)))
     
-    #         # if tag has attribute of class
-    #         if i.has_attr('img'):
-    
-    #             if len( i['img'] ) != 0:
-    #                 class_list.add(" ".join( i['img']))
-    
-    # print( class_list )
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-async def get_html(username):
-    # browser = await launch({"headless": False, "args": ["--start-maximized"]})
-    browser = await launch()
-    page = await browser.newPage()
-    await page.goto(URL.format(username), {'waitUntil' : ['load', 'domcontentloaded', 'networkidle0']})
-    html = await page.content()
-    await browser.close()
-    return html
