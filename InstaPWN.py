@@ -1,15 +1,47 @@
 # importing libraries
+
 import os
+import pandas as pd
 import shutil
-import time
 import requests
 import urllib
 from bs4 import BeautifulSoup
 from Colors import colors
 from googlesearch import search
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+
+
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+import time
+    
+opts = webdriver.ChromeOptions()
+
+opts.headless = True
+opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
+
 URL = 'https://www.instagram.com/{}/?hl=en'
+
+
+def delete_cache():
+    driver.execute_script("window.open('');")
+    driver.switch_to.window(driver.window_handles[-1])
+    driver.get('chrome://settings/clearBrowserData') # for old chromedriver versions use cleardriverData
+    actions = ActionChains(driver) 
+    actions.send_keys(Keys.TAB * 3 + Keys.DOWN * 3) # send right combination
+    actions.perform()
+    actions = ActionChains(driver) 
+    actions.send_keys(Keys.TAB * 4 + Keys.ENTER) # confirm
+    actions.perform()
+    driver.close() # close this tab
+    driver.switch_to.window(driver.window_handles[0]) # switch back
+
+
+
+
+
 
 # instantiate a chrome options object so you can set the size and headless preference
 
@@ -138,45 +170,75 @@ def getMedia(username):
             if start == -1: return
             yield start
             start += len(sub) # use start += 1 to find overlapping matches
-
-
     def replace_all_bad_chars_in_url(url):
         return url.replace('&amp;', '&')
     
-    opts = Options()
-    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
-    opts.add_argument(user_agent)
-
-    opts.headless = False
-
-    driver = webdriver.Chrome('./chromedriver.exe', options=opts)
- 
-    driver.get(f'https://www.instagram.com/{username}/?hl=en')
-    
-    # converting the text
+    #gets all image urls
+    driver.get(URL.format(username))
     html = driver.page_source
-
     soup = BeautifulSoup(html, 'html.parser')
-    # all_html = soup.text()
-    # print(soup.prettify)
-    page_html = str(soup)
-    print(page_html)
+    new_html = str(soup)
+    results = list(find_all(new_html, 'https://instagram'))
+
+
+
+    i = 0
+    post_ids=[]
+    new_urls=[]
     
-    index = list(find_all(page_html, 'https://instagram')) # [0, 5, 10, 15]
-    print(index)
-    i=0
-    for post_url in index:
-        # shutil.move(img_file, parent_dir + f'\{username}')
-        filter1 = replace_all_bad_chars_in_url(page_html[post_url: post_url + 361])
+    for posts_url in results:
+        filter1 = replace_all_bad_chars_in_url(new_html[posts_url: posts_url + 361])
         filter2 = filter1.split('"')[0]
         filter3 = filter2.split(' ')[0]
-        photo_url = filter3
-        print(photo_url)
+        filter4 = str(filter3[54:96])
         
+        new_urls.append(filter3)#get photo url
+
+        post_ids.append(filter4)#get photo id
         
-        img_file = username + str(i) + '.png'
-        urllib.request.urlretrieve(photo_url, img_file)
-            
-        i+=1
-    # print ("\n".join(set(tag['src'] for tag in tags)))
+    post_id_filter = []
+    [post_id_filter.append(x) for x in post_ids if x not in post_id_filter]
+
+    post_ids = post_id_filter
     
+    
+    
+    
+    sorted_urls = [[]]*len(post_ids)
+    
+    print(sorted_urls)
+    print(len(new_urls))
+    
+    n = 0
+    for i in range(len(post_ids)-1):
+        for url in new_urls:
+            if post_ids[i] in url:
+                sorted_urls[i].append(url)
+
+        # n+=1
+
+    for i in sorted_urls:
+        print(i)
+        print('\n')
+                
+                
+    
+    
+    # parent_dir = 'pwned_users'
+    # user_dir = username
+
+    # if not os.path.exists(parent_dir):
+    #     os.mkdir(parent_dir)
+    
+    # num = 0
+    # for url in sorted_urls:
+    #     # print(url)
+    #     # print('\n')
+    #     if not os.path.exists(parent_dir + f'\{username}'):
+    #         os.mkdir(parent_dir + f'\{username}')
+        
+    #     for photoUrl in url:
+    #         img_file = username + str(num) + '.png'
+    #         urllib.request.urlretrieve(photoUrl, img_file)
+    #         shutil.move(img_file, parent_dir + f'\{username}')
+    #         num+=1

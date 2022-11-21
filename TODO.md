@@ -1,5 +1,5 @@
 <DONE> Get users Profile Picture
-<TODO> Download Users’ post data like pictures, media, or bio between from time to time
+<DONE> Download Users’ post data
 <TODO> Download hashtag post data
 <DONE> Get targets followers + followings
 <TODO> Get user’s post’s comments

@@ -1,3 +1,4 @@
+import click
 import os, sys
 import InstaPWN
 from splashscreen import splashScreen
@@ -12,7 +13,7 @@ def print_menu():
     print('      -clear       | Clears the Screen')
     print('      -exit        | Exits the program')
     print('      -search      | Search for target by name')
-    print('      -username    | Get targets followers, following, and posts')
+    print('      -stats       | Get targets followers, following, and posts')
     print('      -photo       | Get targets profile picture')
     print('      -posts       | Download all targets posts')
     # print('      -email       | Get targets email')
@@ -74,12 +75,11 @@ def selection():
             else:
                 print(colors.red + 'Invalid syntax' + colors.reset)
         selection()     
-    elif usr_input[0] == '-username':
+    elif usr_input[0] == '-stats':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
-            print(colors.yellow + '-username [username of target]')
+            print(colors.yellow + '-stats [username of target]')
             print(colors.yellow + 'Examples:')
-            print(colors.yellow + '    -username project__exodus')
-            print(colors.yellow + '    -uname project__exodus')
+            print(colors.yellow + '    -stats project__exodus')
             selection()
         else:
             InstaPWN.getUsernameInfo(usr_input[1])
@@ -127,5 +127,6 @@ def selection():
         
 
 if __name__=='__main__':
+    InstaPWN.delete_cache()
     startProgram()
     selection()
