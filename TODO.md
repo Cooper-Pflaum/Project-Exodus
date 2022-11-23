@@ -9,19 +9,22 @@
 
 
 
-DONE:
+# DONE:
+---
 - Search for top results related to target 
 - Get targets followers + followings
 - Get users Profile Picture
 - Download Users’ post data
 - Implement Facial Recognition
 
-TODO:
+# TODO:
+---
 - Implement facial recogn   tion
 - Presentation
 
 
-WAY IN THE FUTURE
+# WAY IN THE FUTURE:
+---
 - Ability to get location
 
 
