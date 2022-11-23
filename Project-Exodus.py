@@ -13,9 +13,9 @@ def print_menu():
     print('      -clear       | Clears the Screen')
     print('      -exit        | Exits the program')
     print('      -search      | Search for target by name')
-    print('      -stats       | Get targets followers, following, and posts')
+    print('      -stats       | Get targets followers, following, and post count')
     print('      -photo       | Get targets profile picture')
-    print('      -posts       | Download all targets posts')
+    print('      -posts       | Download all targets posts (pictures only)')
     print('      -delete      | Deletes all gathered target info')
     # print('      -email       | Get targets email')
     # print('      -phone       | Get targets phone number')
@@ -109,7 +109,7 @@ def selection():
     elif usr_input[0] == '-posts':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
             print(colors.yellow + '-posts [username of target]')
-            print(colors.yellow + '    downloads the targets posts')
+            print(colors.yellow + '    downloads the targets posts as images only (will add support for videos later)')
             # print(colors.yellow + '\n    Options:')
             # print(colors.yellow + '        -png        specifies file type *.png')
             # print(colors.yellow + '        -jpg        specifies file type *.jpg')
