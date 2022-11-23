@@ -10,8 +10,11 @@
 
 
 
-
-
+- Search for top results related to target 
+- Get targets followers + followings
+- Get users Profile Picture
+- Download Users’ post data
+- Implement Facial Recognition
 
 
 
