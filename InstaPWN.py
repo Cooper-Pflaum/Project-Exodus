@@ -222,11 +222,10 @@ def getMedia(username):
                 # print(colors.reset + '\n')
         
         
-        
-        for i in range(len(sorted_urls)):
+        # while i < len(sorted_urls):
             # print(sorted_urls[i])
             # print('\n')
-            
+        for i in range(len(sorted_urls)):
             for url in sorted_urls[i]:
                 if '1024x1024' in url:
                     highest_res_urls.append(url)
@@ -242,6 +241,10 @@ def getMedia(username):
                     highest_res_urls.append(url)
                 else:
                     highest_res_urls.append(url)
+                    
+                    
+                break
+
                 
 
 
@@ -267,7 +270,6 @@ def getMedia(username):
         #     photo_id = filter4
             
         #     new_urls.append(photo_url)#get photo url
-
         for photo_url in highest_res_urls:
             print(photo_url)
 
