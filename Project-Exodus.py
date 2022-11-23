@@ -16,6 +16,7 @@ def print_menu():
     print('      -stats       | Get targets followers, following, and posts')
     print('      -photo       | Get targets profile picture')
     print('      -posts       | Download all targets posts')
+    print('      -delete      | Deletes all gathered target info')
     # print('      -email       | Get targets email')
     # print('      -phone       | Get targets phone number')
     # print('      -dox         | Get targets address')
@@ -31,8 +32,12 @@ def reboot():
     os.system('cls')
 
 def selection():
+
     usr_input = input(colors.reset + 'Please enter a command: ' + colors.grey).lower().split()
-    if usr_input[0] == '-h' or usr_input[0] == '-help':
+    
+    if len(usr_input) == 0:
+        selection()
+    elif usr_input[0] == '-h' or usr_input[0] == '-help':
         print_menu()
         selection()
     elif usr_input[0] == '-exit' or usr_input[0] == 'exit':
@@ -114,6 +119,18 @@ def selection():
         else:
             if len(usr_input) == 2:
                 InstaPWN.getMedia(usr_input[1])
+                selection()
+            else:
+                print(colors.red + 'Invalid syntax' + colors.reset)
+                selection()
+    elif usr_input[0] == '-delete':
+        if usr_input[1] == '-h' or usr_input[1] == '-help':
+            print(colors.yellow + '-delete [username of target]')
+            print(colors.yellow + '    Deletes all gathered target info')
+            selection()
+        else:
+            if len(usr_input) == 2:
+                InstaPWN.deleteTargetData(usr_input[1])
                 selection()
             else:
                 print(colors.red + 'Invalid syntax' + colors.reset)
