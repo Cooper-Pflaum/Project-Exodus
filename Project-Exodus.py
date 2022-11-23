@@ -10,13 +10,15 @@ def print_menu():
     multiple arguments which can be shown with -h or -help
     ''')    
     print('    Options:')
-    print('      -clear       | Clears the Screen')
-    print('      -exit        | Exits the program')
-    print('      -search      | Search for target by name')
-    print('      -stats       | Get targets followers, following, and post count')
-    print('      -photo       | Get targets profile picture')
-    print('      -posts       | Download all targets posts (pictures only)')
-    print('      -delete      | Deletes all gathered target info')
+    print('      -search      |     Search for target by name')
+    print('      -stats       |     Get targets followers, following, and post count')
+    print('      -photo       |     Get targets profile picture')
+    print('      -posts       |     Download all targets posts (pictures only)')
+    print('      -compare     |     Compares inputted photo to posts made by target')
+    print('      -delete      |     Deletes all gathered info on target')
+    print('      -clear       |     Clears the Screen')
+    print('      -exit        |     Exits the program')
+    
     # print('      -email       | Get targets email')
     # print('      -phone       | Get targets phone number')
     # print('      -dox         | Get targets address')
@@ -87,7 +89,7 @@ def selection():
             print(colors.yellow + '    -stats project__exodus')
             selection()
         else:
-            InstaPWN.getUsernameInfo(usr_input[1])
+            InstaPWN.getStats(usr_input[1])
             selection()
     elif usr_input[0] == '-photo':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
@@ -118,7 +120,24 @@ def selection():
             selection()
         else:
             if len(usr_input) == 2:
-                InstaPWN.getMedia(usr_input[1])
+                InstaPWN.getPosts(usr_input[1])
+                selection()
+            else:
+                print(colors.red + 'Invalid syntax' + colors.reset)
+                selection()
+    elif usr_input[0] == '-compare':
+        if usr_input[1] == '-h' or usr_input[1] == '-help':
+            print(colors.yellow + '-compare [username of target]')
+            print(colors.yellow + '    compares inputted photo of target with posts made by target username')
+            # print(colors.yellow + '\n    Options:')
+            # print(colors.yellow + '        -png        specifies file type *.png')
+            # print(colors.yellow + '        -jpg        specifies file type *.jpg')
+            
+            
+            selection()
+        else:
+            if len(usr_input) == 2:
+                InstaPWN.comparePhotosAndPosts(usr_input[1])
                 selection()
             else:
                 print(colors.red + 'Invalid syntax' + colors.reset)

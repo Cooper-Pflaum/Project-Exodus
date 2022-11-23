@@ -2,18 +2,18 @@
 
 import os
 import shutil
-import re
 import requests
+import tkinter
 import urllib
 from bs4 import BeautifulSoup
 from Colors import colors
 from datetime import datetime
 from googlesearch import search
-
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
+from tkinter import filedialog
 
 
 
@@ -29,6 +29,13 @@ driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
 
 #used for finding the webapage with the needed username
 link = 'https://www.instagram.com/{}/?hl=en'
+
+
+
+tkinter.Tk().withdraw() # prevents an empty tkinter window from appearing
+
+
+
 
 
 
@@ -84,11 +91,11 @@ def getTopResults(name, last_name = '', num_results=20, command = ''):
     for usr in pwned_users:
         if(command == '-scan'):
             print(colors.yellow + '    ' + usr + colors.reset)
-            getUsernameInfo(usr)
+            getStats(usr)
         else:
             print(colors.green + '    ' + usr + colors.reset)
 
-def getUsernameInfo(username):
+def getStats(username):
      
     # getting the request from url
     response = requests.get(link.format(username))
@@ -152,7 +159,7 @@ def getPhoto(username, command):
             os.remove(parent_dir + f'\{username}\{username}.jpg')
            
             
-        img_file = username + '.jpg'
+        img_file = username + '_profile_pcture.jpg'
         urllib.request.urlretrieve(photo_url, img_file)
         shutil.move(img_file, parent_dir + f'\{username}')
     if command == '-d':
@@ -160,7 +167,7 @@ def getPhoto(username, command):
             shutil.rmtree(parent_dir + f'\{username}')
         print(colors.green + 'Successfully downloaded to folder: pwned_users')
 
-def getMedia(username):
+def getPosts(username):
     #finds all substrings in a string and returns their locations
     def find_all(a_str, sub):
         start = 0
@@ -169,9 +176,8 @@ def getMedia(username):
             if start == -1: return
             yield start
             start += len(sub) # use start += 1 to find overlapping matches
-          
-            
-    #Used to make the originally pulled urls work again
+     
+    #Used to make the originally pulled urls work again for downloading
     def replace_all_bad_chars_in_url(url):
         return url.replace('&amp;', '&')
     
@@ -266,7 +272,7 @@ def getMedia(username):
             img_file = username + str(time) + '.png'
             urllib.request.urlretrieve(photo_url, img_file)
             shutil.move(img_file, parent_dir + f'\{username}')
-            
+
     #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
         print(colors.red + 'Error 429: Too many requests. Please try again a little later')    
@@ -274,6 +280,15 @@ def getMedia(username):
         print(colors.red + 'Error: url not found')    
     elif response.status_code == 500:
         print(colors.red + 'Internal Error')
+    
+def comparePhotosAndPosts(username):
+    print(colors.grey + 'Please select image that you would like to compare:')
+    file_path = filedialog.askopenfile()
+    print(file_path)
+    
+    
+    
+    
     
 def deleteTargetData(username):
     parent_dir = 'pwned_users'
