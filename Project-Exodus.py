@@ -124,12 +124,15 @@ def selection():
                 print(colors.red + 'Invalid syntax' + colors.reset)
                 selection()
     elif usr_input[0] == '-delete':
+        if len(usr_input) == 1:
+                print(colors.red + 'Invalid syntax' + colors.reset)
+                selection()
         if usr_input[1] == '-h' or usr_input[1] == '-help':
             print(colors.yellow + '-delete [username of target]')
             print(colors.yellow + '    Deletes all gathered target info')
             selection()
         else:
-            if len(usr_input) == 2:
+            if len(usr_input) == 2 and usr_input[1] != '':
                 InstaPWN.deleteTargetData(usr_input[1])
                 selection()
             else:

@@ -1,4 +1,4 @@
-# importing libraries
+# getting all of them imports to make the code do its thing
 
 import os
 import shutil
@@ -9,22 +9,32 @@ from bs4 import BeautifulSoup
 from Colors import colors
 from datetime import datetime
 from googlesearch import search
+
 from selenium import webdriver
-
-
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-import time
+
+
+
+
+
     
+#---GENERATES A HIDDEN BROWSER THAT ALLOWS ME TO PULL ALL OF THE IMAGES OFF OF A PAGE. MUY IMPORTANTE!!!---#
 opts = webdriver.ChromeOptions()
 opts.headless = True
 opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-
 driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
 
+
+
+#used for finding the webapage with the needed username
 link = 'https://www.instagram.com/{}/?hl=en'
 
 
+
+#IDK WHY THIS WORKS BUT IT DOES
+#used to delete cache and cookies so you wont get flagged as often
+#however it does make it slow to start
 def delete_cache():
     driver.execute_script("window.open('');")
     driver.switch_to.window(driver.window_handles[-1])
@@ -98,7 +108,7 @@ def getUsernameInfo(username):
             
             # again splitting the content
             text = text.split(' ')
-            # return parse_data(meta.attrs['content'])
+
             
             print(colors.green + colors.italics + '      Followers: ' + text[0] + '\n      Following: ' + text[2] + '\n      Posts: ' + text[4] + colors.reset)
         else:
@@ -151,6 +161,7 @@ def getPhoto(username, command):
         print(colors.green + 'Successfully downloaded to folder: pwned_users')
 
 def getMedia(username):
+    #finds all substrings in a string and returns their locations
     def find_all(a_str, sub):
         start = 0
         while True:
@@ -158,14 +169,22 @@ def getMedia(username):
             if start == -1: return
             yield start
             start += len(sub) # use start += 1 to find overlapping matches
+          
+            
+    #Used to make the originally pulled urls work again
     def replace_all_bad_chars_in_url(url):
         return url.replace('&amp;', '&')
     
-    #gets all image urls
-    response = requests.get(link.format(username))
+    #generates the webpage while hidden and gets html/javascript code
+    response = requests.get(link.format(username)) #used to get the proper error messages
     driver.get(link.format(username))
+    
+    #checks for good response code
     if response.status_code == 200:
-        print(colors.green + 'Successfully found targets page' + colors.reset)
+        print(colors.green + '      Successfully found targets page' + colors.reset)
+        
+        
+        #parses the html for the later functions
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         new_html = str(soup)
@@ -173,58 +192,50 @@ def getMedia(username):
 
 
 
-        i = 0
-        post_ids=[]
-
-        new_urls=[]
         
+        #makes pwned_users and subsequent user directory folders
         parent_dir = 'pwned_users'
-        
-        
         if not os.path.exists(parent_dir):
             os.mkdir(parent_dir)
         if not os.path.exists(parent_dir + f'\{username}'):
                 os.mkdir(parent_dir + f'\{username}')
 
-        #-------------------------GET POST IDS-------------------------#
+
+
+        post_ids=[]
+
+        urls=[]
+#-------------------------GET POST IDS-------------------------#
         for post in results: 
+            #all of the needed filters to get the needed content
             filter1 = replace_all_bad_chars_in_url(new_html[post: post + 361])
             filter2 = filter1.split('"')[0]
             filter3 = filter2.split(' ')[0]
             filter4 = str(filter3[54:100])
             
             
-            
+            #sets both of those to their proper filters
             photo_url = filter3
             photo_id = filter4
             
             
-            new_urls.append(photo_url)#get photo url
-            post_ids.append(photo_id)#get photo id
+            urls.append(photo_url)      #photo url
+            post_ids.append(photo_id)   #photo id
             
             
+        #declares the needed size for the sorted array (no space goes unused)
         post_ids = list(dict.fromkeys(post_ids))
         sorted_urls = [[] for j in range(len(post_ids))]
-        
-                
         highest_res_urls = []
 
-        
+        #sorts all of the photos
         for i in range(len(post_ids)):
-            for url in new_urls:
-                # print(post_ids[i])
-                # print(url)
+            for url in urls:
                 if post_ids[i] in url:
                     sorted_urls[i].append(url)
-                #     print(colors.green + 'Match')
-                # else:
-                #     print(colors.red + 'No match')
-                # print(colors.reset + '\n')
-        
-        
-        # while i < len(sorted_urls):
-            # print(sorted_urls[i])
-            # print('\n')
+
+
+        #chooses highest resoluion from each photo
         for i in range(len(sorted_urls)):
             for url in sorted_urls[i]:
                 if '1024x1024' in url:
@@ -241,38 +252,12 @@ def getMedia(username):
                     highest_res_urls.append(url)
                 else:
                     highest_res_urls.append(url)
-                    
-                    
                 break
 
-                
 
-
-
-
-
-
-
-
-
-
-
-
-
-        #-------------------------DOWNLOAD PHOTO FROM URL-------------------------#
-        # for post in results:
-        #     filter1 = replace_all_bad_chars_in_url(new_html[post: post + 361])
-        #     filter2 = filter1.split('"')[0]
-        #     filter3 = filter2.split(' ')[0]
-        #     filter4 = str(filter3[54:96])
-            
-        #     photo_url = filter3
-        #     photo_id = filter4
-            
-        #     new_urls.append(photo_url)#get photo url
+        #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS CURRENT TIME AS THE NAME-------------------------#
+        highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
         for photo_url in highest_res_urls:
-            print(photo_url)
-
             time = str(datetime.now().time())
             
             time = time.replace(':', '-')
@@ -281,6 +266,8 @@ def getMedia(username):
             img_file = username + str(time) + '.png'
             urllib.request.urlretrieve(photo_url, img_file)
             shutil.move(img_file, parent_dir + f'\{username}')
+            
+    #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
         print(colors.red + 'Error 429: Too many requests. Please try again a little later')    
     elif response.status_code == 404:
