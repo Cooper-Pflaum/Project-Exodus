@@ -10,7 +10,7 @@
 
 
 # DONE:
----
+
 - Search for top results related to target 
 - Get targets followers + followings
 - Get users Profile Picture
@@ -18,13 +18,11 @@
 - Implement Facial Recognition
 
 # TODO:
----
 - Implement facial recogn   tion
 - Presentation
 
 
 # WAY IN THE FUTURE:
----
 - Ability to get location
 
 
