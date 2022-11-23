@@ -1,10 +1,10 @@
 <DONE> Search for top results related to target
 <DONE> Get targets followers + followings
 <DONE> Get users Profile Picture
+    <TODO> pull it from top user pictures
 <DONE> Download Users’ post data
+    <TODO> print if profile is private
 <TODO> Implement Facial Recognition
-
-
 
 
 
@@ -18,12 +18,18 @@
 - Implement Facial Recognition
 
 # TODO:
-- Implement facial recogn   tion
+- Implement facial recognition
+
 - Presentation
+
+# FIXME:
+- download highest res profile_img
+- print private/public status for profile
 
 
 # WAY IN THE FUTURE:
 - Ability to get location
+- Doxing ability
 
 
 

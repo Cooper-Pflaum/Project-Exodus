@@ -187,7 +187,7 @@ def getPosts(username):
     
     #checks for good response code
     if response.status_code == 200:
-        print(colors.green + '      Successfully found targets page' + colors.reset)
+        print(colors.green + 'Successfully found targets page' + colors.reset)
         
         
         #parses the html for the later functions
@@ -260,8 +260,9 @@ def getPosts(username):
                     highest_res_urls.append(url)
                 break
 
-
+        
         #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS CURRENT TIME AS THE NAME-------------------------#
+        # if len(highest_res_urls) != 0
         highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
         for photo_url in highest_res_urls:
             time = str(datetime.now().time())
@@ -272,14 +273,13 @@ def getPosts(username):
             img_file = username + str(time) + '.png'
             urllib.request.urlretrieve(photo_url, img_file)
             shutil.move(img_file, parent_dir + f'\{username}')
-
     #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
         print(colors.red + 'Error 429: Too many requests. Please try again a little later')    
     elif response.status_code == 404:
-        print(colors.red + 'Error: url not found')    
+        print(colors.red + 'Error 404: Username does not exist')    
     elif response.status_code == 500:
-        print(colors.red + 'Internal Error')
+        print(colors.red + 'Instagram server error')
     
 def comparePhotosAndPosts(username):
     print(colors.grey + 'Please select image that you would like to compare:')
