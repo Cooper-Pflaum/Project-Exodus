@@ -1,5 +1,7 @@
 # getting all of them imports to make the code do its thing
 
+import faceRecognize
+import faceEncode
 import os
 import shutil
 import requests
@@ -12,37 +14,32 @@ from googlesearch import search
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-
 from tkinter import filedialog
 
 
 
 
     
-#---GENERATES A HIDDEN BROWSER THAT ALLOWS ME TO PULL ALL OF THE IMAGES OFF OF A PAGE. MUY IMPORTANTE!!!---#
-opts = webdriver.ChromeOptions()
-opts.headless = True
-opts.add_experimental_option('excludeSwitches', ['enable-logging'])
-driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
 
+def init():
+    #---GENERATES A HIDDEN BROWSER THAT ALLOWS ME TO PULL ALL OF THE IMAGES OFF OF A PAGE. MUY IMPORTANTE!!!---#
+    opts = webdriver.ChromeOptions()
+    opts.headless = True
+    opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+    global driver 
+    driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
+    delete_cache()
 
+    #used for finding the webapage with the needed username    
+    global link    
+    link = 'https://www.instagram.com/{}/?hl=en'
 
-#used for finding the webapage with the needed username
-link = 'https://www.instagram.com/{}/?hl=en'
+    tkinter.Tk().withdraw() # prevents an empty tkinter window from appearing
 
-
-
-tkinter.Tk().withdraw() # prevents an empty tkinter window from appearing
-
-
-
-
-
-
-#IDK WHY THIS WORKS BUT IT DOES
-#used to delete cache and cookies so you wont get flagged as often
-#however it does make it slow to start
 def delete_cache():
+    #idk why this works but it allows me to bypass the login redirect so it stays
+    #used to delete cache and cookies so you wont get flagged as often
+    #however it does make it slow to start
     driver.execute_script("window.open('');")
     driver.switch_to.window(driver.window_handles[-1])
     driver.get('chrome://settings/clearBrowserData') # for old chromedriver versions use cleardriverData
@@ -162,6 +159,7 @@ def getPhoto(username, command):
         img_file = username + '_profile_pcture.jpg'
         urllib.request.urlretrieve(photo_url, img_file)
         shutil.move(img_file, parent_dir + f'\{username}')
+        
     if command == '-d':
         if os.path.exists(parent_dir + f'\{username}'):
             shutil.rmtree(parent_dir + f'\{username}')
@@ -263,7 +261,7 @@ def getPosts(username):
         
         #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS CURRENT TIME AS THE NAME-------------------------#
         # if len(highest_res_urls) != 0
-        highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
+        # highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
         for photo_url in highest_res_urls:
             time = str(datetime.now().time())
             
@@ -282,20 +280,53 @@ def getPosts(username):
         print(colors.red + 'Instagram server error')
     
 def comparePhotosAndPosts(username):
-    print(colors.grey + 'Please select image that you would like to compare:')
-    file_path = filedialog.askopenfile()
-    print(file_path)
+    print(colors.grey + 'Please select image containing the face that you would like to compare:')
+    file = filedialog.askopenfile()
+    
+    parent_dir = 'pwned_users'
+    username_dir = f'{parent_dir}\{username}'
+    
+    if file: 
+        faceEncode.encodeFace(file.name)
+    
+    # file2 = filedialog.askopenfile()
+    
+    faceRecognize.findFace(username_dir)
+    
+        
     
     
     
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
 def deleteTargetData(username):
     parent_dir = 'pwned_users'
     
     if os.path.exists(parent_dir + f'\{username}'):
             shutil.rmtree(parent_dir + f'\{username}')
             print(colors.red + f'Successfully deleted {username}')
+
+def deleteAllTargetsInfo():
+    parent_dir = r'pwned_users\\'
+    
+    all_user_dirs = os.listdir(parent_dir)
+    
+    for directory in all_user_dirs:
+        shutil.rmtree(parent_dir + directory)
+    
+    print(colors.red + f'Successfully deleted all targets')
+
+
 
 
 

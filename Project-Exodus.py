@@ -27,6 +27,7 @@ def print_menu():
 def startProgram():
     reboot()
     splashScreen()
+    InstaPWN.init()
     print_menu()
 
 def reboot():
@@ -34,7 +35,7 @@ def reboot():
     os.system('cls')
 
 def selection():
-
+    
     usr_input = input(colors.reset + 'Please enter a command: ' + colors.grey).lower().split()
     
     if len(usr_input) == 0:
@@ -150,6 +151,9 @@ def selection():
             print(colors.yellow + '-delete [username of target]')
             print(colors.yellow + '    Deletes all gathered target info')
             selection()
+        if usr_input[1] == '-all':
+            InstaPWN.deleteAllTargetsInfo()
+            selection()
         else:
             if len(usr_input) == 2 and usr_input[1] != '':
                 InstaPWN.deleteTargetData(usr_input[1])
@@ -157,6 +161,7 @@ def selection():
             else:
                 print(colors.red + 'Invalid syntax' + colors.reset)
                 selection()
+
     elif (len(usr_input) == 1 and usr_input[0] != '-exit' and usr_input[0] != '-reboot') or ('-' not in usr_input[0]):
         print(colors.red + 'Invalid syntax' + colors.reset)
         selection()
@@ -166,6 +171,5 @@ def selection():
         
 
 if __name__=='__main__':
-    InstaPWN.delete_cache()
     startProgram()
     selection()
