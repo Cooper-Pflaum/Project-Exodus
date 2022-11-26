@@ -16,7 +16,7 @@ def print_menu():
     print('      -posts       |     Download all targets posts (pictures only)')
     print('      -compare     |     Compares inputted photo to posts made by target')
     print('      -delete      |     Deletes all gathered info on target')
-    print('      -clear       |     Clears the Screen')
+    print('      -reset       |     Resets the screen')
     print('      -exit        |     Exits the program')
     
     # print('      -email       | Get targets email')
@@ -24,15 +24,15 @@ def print_menu():
     # print('      -dox         | Get targets address')
     print(colors.reset)
 
-def startProgram():
-    reboot()
-    splashScreen()
-    InstaPWN.init()
-    print_menu()
-
 def reboot():
     print(colors.red + 'Rebooting Program' + colors.reset)
     os.system('cls')
+
+def startProgram():
+    InstaPWN.init()
+    reboot()
+    splashScreen()
+    print_menu()
 
 def selection():
     
@@ -45,9 +45,10 @@ def selection():
         selection()
     elif usr_input[0] == '-exit' or usr_input[0] == 'exit':
         print(colors.red + 'Exiting Program' + colors.reset)
+        InstaPWN.driver.quit()
         quit()
-    elif usr_input[0] == '-clear':
-        print(colors.red + 'Rebooting Program' + colors.reset)
+    elif usr_input[0] == '-reset':
+        print(colors.red + 'Resetting Program' + colors.reset)
         os.system('cls')
         startProgram()
         selection()
@@ -94,17 +95,18 @@ def selection():
             selection()
     elif usr_input[0] == '-photo':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
-            print(colors.yellow + '-photo [username of target][-png -jpg]')
-            print(colors.yellow + '    Outputs the profile picture of the target to a specified file type')
-            print(colors.yellow + '\n    Options:')
-            print(colors.yellow + '        -png        specifies file type *.png')
-            print(colors.yellow + '        -jpg        specifies file type *.jpg')
+            print(colors.yellow + '-photo [username of target]')
+            # print(colors.yellow + '-photo [username of target][-png -jpg]')
+            print(colors.yellow + '    Downloads the targets profile picture')
+            # print(colors.yellow + '\n    Options:')
+            # print(colors.yellow + '        -png        specifies file type *.png')
+            # print(colors.yellow + '        -jpg        specifies file type *.jpg')
             
             
             selection()
         else:
-            if len(usr_input) == 3:
-                InstaPWN.getPhoto(usr_input[1], usr_input[2])
+            if len(usr_input) == 2:
+                InstaPWN.getPhoto(usr_input[1])
                 selection()
             else:
                 print(colors.red + 'Invalid syntax' + colors.reset)

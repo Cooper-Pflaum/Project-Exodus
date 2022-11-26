@@ -23,9 +23,13 @@ from tkinter import filedialog
 
 def init():
     #---GENERATES A HIDDEN BROWSER THAT ALLOWS ME TO PULL ALL OF THE IMAGES OFF OF A PAGE. MUY IMPORTANTE!!!---#
+    
+
     opts = webdriver.ChromeOptions()
-    opts.headless = True
+    opts.headless = False
     opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+
     global driver 
     driver = webdriver.Chrome('./chromedriver.exe', chrome_options=opts)
     delete_cache()
@@ -120,50 +124,121 @@ def getStats(username):
     else:
         print(colors.red + colors.italics + 'Error 429       Please try again later')
 
-def getPhoto(username, command):
-    # getting the request from url
-    response = requests.get(link.format(username))
-    # converting the text
-    soup = BeautifulSoup(response.text, 'html.parser')
-    photo = soup.find_all('meta', attrs={'property': 'og:image'})
-    photo_url = photo[0].get('content')
+def getPhoto(username):
+    #finds all substrings in a string and returns their locations
+    def find_all(a_str, sub):
+        start = 0
+        while True:
+            start = a_str.find(sub, start)
+            if start == -1: return
+            yield start
+            start += len(sub) # use start += 1 to find overlapping matches
+     
+    #Used to make the originally pulled urls work again for downloading
+    def replace_all_bad_chars_in_url(url):
+        return url.replace('&amp;', '&')
     
-    parent_dir = 'pwned_users'
-
-    if not os.path.exists(parent_dir):
-        os.mkdir(parent_dir)
+    #generates the webpage while hidden and gets html/javascript code
+    response = requests.get(link.format(username)) #used to get the proper error messages
+    if driver.current_url != link.format(username):
+        driver.get(link.format(username))
     
-    if command == '-png':
+    #checks for good response code
+    if response.status_code == 200:
         
-            
+        
+        #parses the html for the later functions
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        new_html = str(soup)
+        results = list(find_all(new_html, 'https://instagram'))
+
+
+
+        
+        #makes pwned_users and subsequent user directory folders
+        parent_dir = 'pwned_users'
+        if not os.path.exists(parent_dir):
+            os.mkdir(parent_dir)
         if not os.path.exists(parent_dir + f'\{username}'):
-            os.mkdir(parent_dir + f'\{username}')
+                os.mkdir(parent_dir + f'\{username}')
+
+
+
+        post_ids=[]
+
+        urls=[]
+#-------------------------GET POST IDS-------------------------#
+        for post in results: 
+            #all of the needed filters to get the needed content
+            filter1 = replace_all_bad_chars_in_url(new_html[post: post + 361])
+            filter2 = filter1.split('"')[0]
+            filter3 = filter2.split(' ')[0]
+            filter4 = str(filter3[54:100])
             
+            
+            #sets both of those to their proper filters
+            photo_url = filter3
+            photo_id = filter4
+            
+            
+            urls.append(photo_url)      #photo url
+            post_ids.append(photo_id)   #photo id
+            
+            
+        #declares the needed size for the sorted array (no space goes unused)
+        post_ids = list(dict.fromkeys(post_ids))
+        sorted_urls = [[] for j in range(len(post_ids))]
+        highest_res_urls = []
+
+        #sorts all of the photos
+        for i in range(len(post_ids)):
+            for url in urls:
+                if post_ids[i] in url:
+                    sorted_urls[i].append(url)
+
+
+        #chooses highest resoluion from each photo
+        for i in range(len(sorted_urls)):
+            for url in sorted_urls[i]:
+                if '1024x1024' in url:
+                    highest_res_urls.append(url)
+                elif '640x640' in url:
+                    highest_res_urls.append(url)
+                elif '480x480' in url:
+                    highest_res_urls.append(url)
+                elif '320x320' in url:
+                    highest_res_urls.append(url)
+                elif '240x240' in url:
+                    highest_res_urls.append(url)
+                elif '150x150' in url:
+                    highest_res_urls.append(url)
+                else:
+                    highest_res_urls.append(url)
+                break
+
+        
+        #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS FILE NAME AS USERNAME-------------------------#
+        # if len(highest_res_urls) != 0
+        # highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
+        profile_pic = highest_res_urls[0]
+
         if os.path.exists(parent_dir + f'\{username}\{username}.png'):
             os.remove(parent_dir + f'\{username}\{username}.png')
             
             
         img_file = username + '.png'
-        urllib.request.urlretrieve(photo_url, img_file)
+        urllib.request.urlretrieve(profile_pic, img_file)
         shutil.move(img_file, parent_dir + f'\{username}')
-    if command == '-jpg':
+        print(colors.green + f'Successfully found profile picture of {username}' + colors.reset)
 
-            
-        if not os.path.exists(parent_dir + f'\{username}'):
-            os.mkdir(parent_dir + f'\{username}')
-            
-        if os.path.exists(parent_dir + f'\{username}\{username}.jpg'):
-            os.remove(parent_dir + f'\{username}\{username}.jpg')
-           
-            
-        img_file = username + '_profile_pcture.jpg'
-        urllib.request.urlretrieve(photo_url, img_file)
-        shutil.move(img_file, parent_dir + f'\{username}')
-        
-    if command == '-d':
-        if os.path.exists(parent_dir + f'\{username}'):
-            shutil.rmtree(parent_dir + f'\{username}')
-        print(colors.green + 'Successfully downloaded to folder: pwned_users')
+    #Checks for bad status code and gives proper error statement
+    elif response.status_code == 429:
+        print(colors.red + 'Error 429: Too many requests. Please try again a little later')    
+    elif response.status_code == 404:
+        print(colors.red + 'Error 404: Username does not exist')    
+    elif response.status_code == 500:
+        print(colors.red + 'Instagram server error')
 
 def getPosts(username):
     #finds all substrings in a string and returns their locations
@@ -181,11 +256,13 @@ def getPosts(username):
     
     #generates the webpage while hidden and gets html/javascript code
     response = requests.get(link.format(username)) #used to get the proper error messages
-    driver.get(link.format(username))
     
+    if driver.current_url != link.format(username):
+        driver.get(link.format(username))
+    
+    # driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
     #checks for good response code
     if response.status_code == 200:
-        print(colors.green + 'Successfully found targets page' + colors.reset)
         
         
         #parses the html for the later functions
@@ -261,26 +338,31 @@ def getPosts(username):
         
         #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS CURRENT TIME AS THE NAME-------------------------#
         # if len(highest_res_urls) != 0
-        # highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
-        for photo_url in highest_res_urls:
-            time = str(datetime.now().time())
-            
-            time = time.replace(':', '-')
-            time = time.replace('.', '-')
-            
-            img_file = username + str(time) + '.png'
-            urllib.request.urlretrieve(photo_url, img_file)
-            shutil.move(img_file, parent_dir + f'\{username}')
+        if len(highest_res_urls) > 1: 
+            highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
+            for photo_url in highest_res_urls:
+                time = str(datetime.now().time())
+                
+                time = time.replace(':', '-')
+                time = time.replace('.', '-')
+                
+                img_file = username + str(time) + '.png'
+                urllib.request.urlretrieve(photo_url, img_file)
+                shutil.move(img_file, parent_dir + f'\{username}')
+            num_of_posts = len(highest_res_urls)
+            print(colors.green + f'Successfully found {num_of_posts} posts from {username}' + colors.reset)
+        else:
+            print(colors.red + 'Private Account' + colors.reset)
     #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
-        print(colors.red + 'Error 429: Too many requests. Please try again a little later')    
+        print(colors.red + 'Error 429: Too many requests. Please try again a little later' + colors.reset)    
     elif response.status_code == 404:
-        print(colors.red + 'Error 404: Username does not exist')    
+        print(colors.red + 'Error 404: Username does not exist' + colors.reset)    
     elif response.status_code == 500:
-        print(colors.red + 'Instagram server error')
+        print(colors.red + 'Instagram server error' + colors.reset)
     
 def comparePhotosAndPosts(username):
-    print(colors.grey + 'Please select image containing the face that you would like to compare:')
+    print(colors.grey + 'Please select image containing the face that you would like to compare:' + colors.reset)
     file = filedialog.askopenfile()
     
     parent_dir = 'pwned_users'
@@ -293,22 +375,6 @@ def comparePhotosAndPosts(username):
     
     faceRecognize.findFace(username_dir)
     
-        
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
 def deleteTargetData(username):
     parent_dir = 'pwned_users'
     
