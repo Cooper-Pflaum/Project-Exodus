@@ -70,7 +70,7 @@ def findFace(username_dir):
                     name = max(count, key=count.get)
                     # will update the list of names
                     names.append(name)
-                    print(count)
+                    # print(count)
         
         
         

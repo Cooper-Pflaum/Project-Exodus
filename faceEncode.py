@@ -20,7 +20,6 @@ def encodeFace(image_path):
         
     # extract the person name from the image path
     name = image_path.split(os.path.sep)[-1]
-    print(name)
     
     # load the input image and convert it from BGR
     image = cv2.imread(image_path)
@@ -42,4 +41,4 @@ def encodeFace(image_path):
         f = open("face_enc", "wb")
         f.write(pickle.dumps(data))#to open file in write mode
         f.close()#to close file
-        print('Made facial encoding')
+        print('Created facial encoding')

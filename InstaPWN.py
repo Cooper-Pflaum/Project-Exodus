@@ -1,3 +1,19 @@
+"""
+     _.-^^---....,,--       
+ _--                  --_  
+<                        >)
+|                         | 
+ \._                   _./  
+    ```--. . , ; .--'''       
+          | |   |             
+       .-=||  | |=-.   
+       `-=#$%&%$#=-'   
+          | ;  :|     
+ _____.,-#%&$@%#&#~,._____
+"""
+#This is the death of me
+
+
 # getting all of them imports to make the code do its thing
 
 import faceRecognize
@@ -26,7 +42,7 @@ def init():
     
 
     opts = webdriver.ChromeOptions()
-    opts.headless = False
+    opts.headless = True
     opts.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 
@@ -44,6 +60,8 @@ def delete_cache():
     #idk why this works but it allows me to bypass the login redirect so it stays
     #used to delete cache and cookies so you wont get flagged as often
     #however it does make it slow to start
+    
+    
     driver.execute_script("window.open('');")
     driver.switch_to.window(driver.window_handles[-1])
     driver.get('chrome://settings/clearBrowserData') # for old chromedriver versions use cleardriverData
@@ -145,14 +163,12 @@ def getPhoto(username):
     
     #checks for good response code
     if response.status_code == 200:
-        
-        
         #parses the html for the later functions
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         new_html = str(soup)
         results = list(find_all(new_html, 'https://instagram'))
-
+        
 
 
         
@@ -168,7 +184,7 @@ def getPhoto(username):
         post_ids=[]
 
         urls=[]
-#-------------------------GET POST IDS-------------------------#
+        #-------------------------GET POST IDS-------------------------#
         for post in results: 
             #all of the needed filters to get the needed content
             filter1 = replace_all_bad_chars_in_url(new_html[post: post + 361])
@@ -221,16 +237,18 @@ def getPhoto(username):
         #-------------------------DOWNLOAD HIGHEST-RES PHOTO FROM URL AND SETS FILE NAME AS USERNAME-------------------------#
         # if len(highest_res_urls) != 0
         # highest_res_urls.pop(0) #Removes profile picture from downloaded images (seperate function for that)
-        profile_pic = highest_res_urls[0]
+        if len(highest_res_urls) > 1: 
 
-        if os.path.exists(parent_dir + f'\{username}\{username}.png'):
-            os.remove(parent_dir + f'\{username}\{username}.png')
-            
-            
-        img_file = username + '.png'
-        urllib.request.urlretrieve(profile_pic, img_file)
-        shutil.move(img_file, parent_dir + f'\{username}')
-        print(colors.green + f'Successfully found profile picture of {username}' + colors.reset)
+            profile_pic = highest_res_urls[0]
+
+            if os.path.exists(parent_dir + f'\{username}\{username}.png'):
+                os.remove(parent_dir + f'\{username}\{username}.png')
+                
+                
+            img_file = username + '.png'
+            urllib.request.urlretrieve(profile_pic, img_file)
+            shutil.move(img_file, parent_dir + f'\{username}')
+            print(colors.green + f'Successfully found profile picture of {username}' + colors.reset)
 
     #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
@@ -240,7 +258,7 @@ def getPhoto(username):
     elif response.status_code == 500:
         print(colors.red + 'Instagram server error')
 
-def getPosts(username):
+def getPosts(username, attempt=1):
     #finds all substrings in a string and returns their locations
     def find_all(a_str, sub):
         start = 0
@@ -270,8 +288,7 @@ def getPosts(username):
         soup = BeautifulSoup(html, 'html.parser')
         new_html = str(soup)
         results = list(find_all(new_html, 'https://instagram'))
-
-
+        
 
         
         #makes pwned_users and subsequent user directory folders
@@ -352,7 +369,13 @@ def getPosts(username):
             num_of_posts = len(highest_res_urls)
             print(colors.green + f'Successfully found {num_of_posts} posts from {username}' + colors.reset)
         else:
-            print(colors.red + 'Private Account' + colors.reset)
+            if 'https://www.instagram.com/accounts/login/?next=' in driver.current_url and attempt < 5:
+                print(colors.red + f'Redirected to login screen. Trying again (Attempt {attempt}/5)')
+                attempt+=1
+                getPosts(username, attempt)
+                
+            # else:
+            #     print(colors.red + 'Private Account' + colors.reset)
     #Checks for bad status code and gives proper error statement
     elif response.status_code == 429:
         print(colors.red + 'Error 429: Too many requests. Please try again a little later' + colors.reset)    
@@ -361,19 +384,19 @@ def getPosts(username):
     elif response.status_code == 500:
         print(colors.red + 'Instagram server error' + colors.reset)
     
-def comparePhotosAndPosts(username):
-    print(colors.grey + 'Please select image containing the face that you would like to compare:' + colors.reset)
-    file = filedialog.askopenfile()
+# def comparePhotosAndPosts(username):
+#     print(colors.grey + 'Please select image containing the face that you would like to compare:' + colors.reset)
+#     file = filedialog.askopenfile()
     
-    parent_dir = 'pwned_users'
-    username_dir = f'{parent_dir}\{username}'
+#     parent_dir = 'pwned_users'
+#     username_dir = f'{parent_dir}\{username}'
     
-    if file: 
-        faceEncode.encodeFace(file.name)
+#     if file: 
+#         faceEncode.encodeFace(file.name)
     
-    # file2 = filedialog.askopenfile()
+#     # file2 = filedialog.askopenfile()
     
-    faceRecognize.findFace(username_dir)
+#     faceRecognize.findFace(username_dir)
     
 def deleteTargetData(username):
     parent_dir = 'pwned_users'
@@ -391,10 +414,3 @@ def deleteAllTargetsInfo():
         shutil.rmtree(parent_dir + directory)
     
     print(colors.red + f'Successfully deleted all targets')
-
-
-
-
-
-
-

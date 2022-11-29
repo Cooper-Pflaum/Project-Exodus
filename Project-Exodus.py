@@ -24,13 +24,13 @@ def print_menu():
     # print('      -dox         | Get targets address')
     print(colors.reset)
 
-def reboot():
+def reset():
     print(colors.red + 'Rebooting Program' + colors.reset)
     os.system('cls')
 
 def startProgram():
     InstaPWN.init()
-    reboot()
+    reset()
     splashScreen()
     print_menu()
 
