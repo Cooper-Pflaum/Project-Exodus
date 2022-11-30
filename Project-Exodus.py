@@ -114,7 +114,7 @@ def selection():
     elif usr_input[0] == '-posts':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
             print(colors.yellow + '-posts [username of target]')
-            print(colors.yellow + '    downloads the targets posts as images only (will add support for videos later)')
+            print(colors.yellow + '    Downloads the targets posts as images only (will add support for videos later)')
             # print(colors.yellow + '\n    Options:')
             # print(colors.yellow + '        -png        specifies file type *.png')
             # print(colors.yellow + '        -jpg        specifies file type *.jpg')
@@ -131,7 +131,7 @@ def selection():
     elif usr_input[0] == '-compare':
         if usr_input[1] == '-h' or usr_input[1] == '-help':
             print(colors.yellow + '-compare [username of target]')
-            print(colors.yellow + '    compares inputted photo of target with posts made by target username')
+            print(colors.yellow + '    Compares inputted photo of target with posts made by target username')
             # print(colors.yellow + '\n    Options:')
             # print(colors.yellow + '        -png        specifies file type *.png')
             # print(colors.yellow + '        -jpg        specifies file type *.jpg')
