@@ -384,19 +384,19 @@ def getPosts(username, attempt=1):
     elif response.status_code == 500:
         print(colors.red + 'Instagram server error' + colors.reset)
     
-# def comparePhotosAndPosts(username):
-#     print(colors.grey + 'Please select image containing the face that you would like to compare:' + colors.reset)
-#     file = filedialog.askopenfile()
+def comparePhotosAndPosts(username):
+    print(colors.grey + 'Please select image containing the face that you would like to compare:' + colors.reset)
+    file = filedialog.askopenfile()
     
-#     parent_dir = 'pwned_users'
-#     username_dir = f'{parent_dir}\{username}'
+    parent_dir = 'pwned_users'
+    username_dir = f'{parent_dir}\{username}'
     
-#     if file: 
-#         faceEncode.encodeFace(file.name)
+    if file: 
+        faceEncode.encodeFace(file.name, username)
     
-#     # file2 = filedialog.askopenfile()
+    # file2 = filedialog.askopenfile()
     
-#     faceRecognize.findFace(username_dir)
+    faceRecognize.findFace(username_dir)
     
 def deleteTargetData(username):
     parent_dir = 'pwned_users'

@@ -9,7 +9,7 @@ import os
 #get paths of each file in folder named Images
 #Images here that contains data(folders of various people)
 
-def encodeFace(image_path):
+def encodeFace(image_path, name_of_user):
     kEncodings = []
     kNames = []
 
@@ -19,8 +19,8 @@ def encodeFace(image_path):
     # for (i, ip) in enumerate(imagePath):
         
     # extract the person name from the image path
-    name = image_path.split(os.path.sep)[-1]
-    
+    # name = image_path.split(os.path.sep)[-1]
+    name = name_of_user
     # load the input image and convert it from BGR
     image = cv2.imread(image_path)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
